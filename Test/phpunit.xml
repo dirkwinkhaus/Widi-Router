@@ -1,0 +1,15 @@
+<!-- @author Alexander During -->
+<phpunit
+    bootstrap="bootstrap.php"
+    colors="true"
+    backupGlobals="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    stopOnFailure="false">
+    <testsuites>
+        <testsuite name="batchjobs">
+            <file>Router/RouterTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>
