@@ -3,9 +3,26 @@ Create a new router before you decide which controller to load. Use a
 service locator to place the route within and/or give the route to the 
 dedicated controller to transmit route parameters.
 
-### Code Sample
+## Change log
+
+1.1.1   
+        + readme updated
+
+1.1.0   
+        + added callback function
+        + added description to package
+
+1.0.2   
+        + fixed package name
+        
+1.0.1   
+        + 1st release
+
+## Code Sample
 ```
 <?php
+use Widi\Components\Router\Route\Route;
+
 require_once(__DIR__ . '/../vendor/autoload.php');
 
 $routes = [
@@ -59,6 +76,9 @@ $routes = [
     ],
     'top_route'     => [
         'route'      => '/top',
+        'callback' => function(Route $route) {
+            echo 'callback of ' . $route->getRouteKey() . ' executed';
+        },
         'options'    => [
             'method'     => \Widi\Components\Router\Route\Method\Get::class,
             'comparator' => \Widi\Components\Router\Route\Comparator\Equal::class,
@@ -112,6 +132,9 @@ $routes = [
 
 $routerFactory = new \Widi\Components\Router\RouterFactory();
 $router        = $routerFactory->__invoke($routes);
+
+//$router->setCaseSensitive(true);
+$router->setEnableRouteCallbacks(true);
 
 $route = $router->route();
 
