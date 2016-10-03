@@ -8,6 +8,7 @@ use Widi\Components\Router\Exception\RouteComparatorNotCreatedException;
 use Widi\Components\Router\Exception\ValidatorNotCreatedException;
 use Widi\Components\Router\Request;
 use Widi\Components\Router\Route\Comparator\Equal;
+use Widi\Components\Router\Route\Route;
 use Widi\Components\Router\Router;
 
 require_once(__DIR__ . '/../../vendor/autoload.php');
@@ -48,6 +49,36 @@ class RouterTest extends TestCase
         $this->assertFalse($router->isRouteNotFound());
         $this->assertEquals($route->getRouteKey(), 'sub_route');
 
+    }
+
+
+    public function testCallbackRouting()
+    {
+
+        $router = new Router(
+            $this->getRequestForPath('/callback'),
+            [
+                'callback_route' => [
+                    'route'   => '/callback',
+                    'callback'        => function (Route $route) {
+                        $route->setParameterValue('callback', true);
+                    },
+                    'options' => [
+                        'method'     => \Widi\Components\Router\Route\Method\Get::class,
+                        'comparator' => \Widi\Components\Router\Route\Comparator\Equal::class,
+                        'controller' => 'ParameterController',
+                        'action'     => 'listAction',
+                    ],
+                ],
+            ]
+        );
+
+        $router->setEnableRouteCallbacks(true);
+        $route = $router->route();
+
+        $this->assertFalse($router->isRouteNotFound());
+        $this->assertEquals($route->getRouteKey(), 'callback_route');
+        $this->assertEquals($route->getParameter('callback'), true);
     }
 
 

@@ -63,6 +63,11 @@ class Route
      */
     protected $parameter;
 
+    /**
+     * @var callable
+     */
+    protected $callBack;
+
 
     /**
      * Route constructor.
@@ -77,6 +82,7 @@ class Route
      * @param array               $parameter
      * @param array               $subRoutes
      * @param array               $extraData
+     * @param callable            $callback
      */
     public function __construct(
         MethodInterface $method,
@@ -88,7 +94,8 @@ class Route
         $action,
         array $parameter = [],
         array $subRoutes = [],
-        array $extraData = []
+        array $extraData = [],
+        callable $callback = null
     ) {
 
         $this->subRoutes        = $subRoutes;
@@ -101,6 +108,7 @@ class Route
         $this->routeStringMatch = $routeStringMatch;
         $this->extraData        = $extraData;
         $this->parameter        = $parameter;
+        $this->callBack         = $callback;
     }
 
 
@@ -266,5 +274,15 @@ class Route
         $this->parameter[$key]['value'] = $value;
 
         return $this;
+    }
+
+
+    /**
+     * @return callable
+     */
+    public function getCallBack()
+    {
+
+        return $this->callBack;
     }
 }

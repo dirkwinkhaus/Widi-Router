@@ -32,12 +32,17 @@ class Router
     /**
      * @var bool
      */
-    protected $routeNotFound;
+    protected $routeNotFound = false;
 
     /**
      * @var bool
      */
-    protected $caseSensitive;
+    protected $caseSensitive = false;
+
+    /**
+     * @var bool
+     */
+    protected $enableRouteCallbacks = false;
 
 
     /**
@@ -49,16 +54,13 @@ class Router
     public function __construct(Request $request, array $routes = [])
     {
 
-        $this->routes        = $routes;
-        $this->request       = $request;
-        $this->routeNotFound = false;
-        $this->caseSensitive = false;
+        $this->routes  = $routes;
+        $this->request = $request;
     }
 
 
     /**
      * @return Route
-     * @throws RouteComparatorNotCreatedException
      */
     public function route()
     {
@@ -98,6 +100,13 @@ class Router
 
         if ($matchingRoute === null) {
             $this->routeNotFound = true;
+        } else {
+            if ($this->enableRouteCallbacks) {
+                $callBack = $matchingRoute->getCallBack();
+                if (is_callable($callBack)) {
+                    $callBack($matchingRoute);
+                }
+            }
         }
 
         return $matchingRoute;
@@ -131,6 +140,30 @@ class Router
     {
 
         $this->caseSensitive = $caseSensitive;
+    }
+
+
+    /**
+     * @param boolean $enableRouteCallbacks
+     *
+     * @return $this
+     */
+    public function setEnableRouteCallbacks($enableRouteCallbacks)
+    {
+
+        $this->enableRouteCallbacks = $enableRouteCallbacks;
+
+        return $this;
+    }
+
+
+    /**
+     * @return boolean
+     */
+    public function isEnableRouteCallbacks()
+    {
+
+        return $this->enableRouteCallbacks;
     }
 
 
@@ -274,7 +307,8 @@ class Router
                             $routeConfiguration['options']['action'],
                             $routeConfiguration['parameters'],
                             $routeConfiguration['sub_routes'],
-                            $routeConfiguration['extra']
+                            $routeConfiguration['extra'],
+                            $routeConfiguration['callback']
                         );
                     } catch (\Exception $exception) {
                         throw new RouteNotCreatedException($exception);
@@ -341,6 +375,7 @@ class Router
             ],
             'extra'      => [
             ],
+            'callback'   => null,
         ];
     }
 

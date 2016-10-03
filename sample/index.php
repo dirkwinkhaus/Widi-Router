@@ -1,4 +1,6 @@
 <?php
+use Widi\Components\Router\Route\Route;
+
 require_once(__DIR__ . '/../vendor/autoload.php');
 
 $routes = [
@@ -52,6 +54,9 @@ $routes = [
     ],
     'top_route'     => [
         'route'      => '/top',
+        'callback' => function(Route $route) {
+            echo 'callback of ' . $route->getRouteKey() . ' executed';
+        },
         'options'    => [
             'method'     => \Widi\Components\Router\Route\Method\Get::class,
             'comparator' => \Widi\Components\Router\Route\Comparator\Equal::class,
@@ -105,6 +110,9 @@ $routes = [
 
 $routerFactory = new \Widi\Components\Router\RouterFactory();
 $router        = $routerFactory->__invoke($routes);
+
+//$router->setCaseSensitive(true);
+$router->setEnableRouteCallbacks(true);
 
 $route = $router->route();
 
