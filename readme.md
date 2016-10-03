@@ -7,10 +7,10 @@ dedicated controller to transmit route parameters.
 
 1.1.1   
         + readme updated
+        + added description to package
 
 1.1.0   
         + added callback function
-        + added description to package
 
 1.0.2   
         + fixed package name

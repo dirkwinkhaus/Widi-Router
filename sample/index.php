@@ -54,14 +54,16 @@ $routes = [
     ],
     'top_route'     => [
         'route'      => '/top',
-        'callback' => function(Route $route) {
-            echo 'callback of ' . $route->getRouteKey() . ' executed';
-        },
         'options'    => [
             'method'     => \Widi\Components\Router\Route\Method\Get::class,
             'comparator' => \Widi\Components\Router\Route\Comparator\Equal::class,
             'controller' => 'TopRouteController',
             'action'     => 'topAction',
+            'callback'   =>
+                function (Route $route) {
+
+                    echo 'callback of ' . $route->getRouteKey() . ' executed';
+                },
         ],
         'extra'      => [
             'some_config_settings' => [
@@ -117,30 +119,70 @@ $router->setEnableRouteCallbacks(true);
 $route = $router->route();
 
 ?>
-<!doctype html>
-<html>
-<body>
-<h1>Router Demo</h1>
+    <!doctype html>
+    <html>
+    <body>
+    <h1>Router Demo</h1>
+    <?php
+    if ($router->isRouteNotFound()) {
+        ?>
+        <h2>404 Page not found!</h2>
+        <?php
+    } else {
+        ?>
+        <h2>route key: "<?php echo $route->getRouteKey(); ?>"</h2>
+        <h3>controller: "<?php echo $route->getController(); ?>"</h3>
+        <h4>action: "<?php echo $route->getAction(); ?>"</h4>
+        <h5>route parameter</h5>
+        <textarea style="width:100%; min-height:200px;"><?php print_r(
+                $route->getParameter()
+            ); ?></textarea>
+        <h5>route extra data</h5>
+        <textarea style="width:100%; min-height:200px;"><?php print_r(
+                $route->getExtraData()
+            ); ?></textarea>
+        <?php
+    }
+    ?>
+    </body>
+    </html>
+
+
+    //------------------------------------------------------------------------------
 <?php
+
+$routerFactory = new \Widi\Components\Router\RouterFactory();
+$router        = $routerFactory->__invoke($routes);
+
+//$router->setCaseSensitive(true);
+$router->setEnableRouteCallbacks(true);
+
+$router->addRoutes(
+    $router->buildRouteArray(
+        'my_route',
+        '/myRoute',
+        function (Route $route) {
+
+            echo $route->getRouteKey();
+        },
+        null,
+        null,
+        [],
+        [
+            $router->buildRouteArray(
+                'my_sub_route',
+                '/mySubRoute',
+                function (Route $route) {
+
+                    echo $route->getRouteKey();
+                }
+            ),
+        ]
+    )
+);
+
+$route = $router->route();
+
 if ($router->isRouteNotFound()) {
-    ?>
-    <h2>404 Page not found!</h2>
-    <?php
-} else {
-    ?>
-    <h2>route key: "<?php echo $route->getRouteKey(); ?>"</h2>
-    <h3>controller: "<?php echo $route->getController(); ?>"</h3>
-    <h4>action: "<?php echo $route->getAction(); ?>"</h4>
-    <h5>route parameter</h5>
-    <textarea style="width:100%; min-height:200px;"><?php print_r(
-            $route->getParameter()
-        ); ?></textarea>
-    <h5>route extra data</h5>
-    <textarea style="width:100%; min-height:200px;"><?php print_r(
-            $route->getExtraData()
-        ); ?></textarea>
-    <?php
+    echo '404';
 }
-?>
-</body>
-</html>

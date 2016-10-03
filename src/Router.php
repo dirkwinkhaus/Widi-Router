@@ -4,9 +4,12 @@ namespace Widi\Components\Router;
 
 use Widi\Components\Router\Exception\RequestMethodNotCreatedException;
 use Widi\Components\Router\Exception\RouteComparatorNotCreatedException;
+use Widi\Components\Router\Exception\RouteKeyAlreadyExistsException;
 use Widi\Components\Router\Exception\RouteNotCreatedException;
 use Widi\Components\Router\Exception\ValidatorNotCreatedException;
 use Widi\Components\Router\Route\Comparator\ComparatorInterface;
+use Widi\Components\Router\Route\Comparator\Equal;
+use Widi\Components\Router\Route\Method\Get;
 use Widi\Components\Router\Route\Method\MethodInterface;
 use Widi\Components\Router\Route\Route;
 use Widi\Components\Router\Route\Validator\ValidatorInterface;
@@ -56,6 +59,80 @@ class Router
 
         $this->routes  = $routes;
         $this->request = $request;
+    }
+
+
+    /**
+     * @param array $routes
+     *
+     * @return $this
+     */
+    public function setRoutes(array $routes)
+    {
+
+        $this->routes = $routes;
+
+        return $this;
+    }
+
+
+    /**
+     * @param array $routes
+     */
+    public function addRoutes(array $routes)
+    {
+
+        $this->routes = $this->routes + $routes;
+    }
+
+
+    /**
+     * @param string        $routeKey
+     * @param string        $route
+     * @param callable|null $callBack
+     * @param null          $controllerString
+     * @param null          $actionString
+     * @param array         $parameters
+     * @param array         $subRoutes
+     * @param string        $methodString
+     * @param string        $comparatorString
+     * @param array         $extraData
+     *
+     * @return array
+     * @throws RouteKeyAlreadyExistsException
+     */
+    public function buildRouteArray(
+        $routeKey,
+        $route,
+        callable $callBack = null,
+        $controllerString = null,
+        $actionString = null,
+        array $parameters = [],
+        array $subRoutes = [],
+        $methodString = Get::class,
+        $comparatorString = Equal::class,
+        array $extraData = []
+    ) {
+
+        if (isset($this->routes[$routeKey])) {
+            throw new RouteKeyAlreadyExistsException($routeKey);
+        }
+
+        return [
+            $routeKey => [
+                'route'      => $route,
+                'options'    => [
+                    'method'     => $methodString,
+                    'comparator' => $comparatorString,
+                    'controller' => $controllerString,
+                    'action'     => $actionString,
+                    'callback'   => $callBack,
+                ],
+                'parameters' => $parameters,
+                'sub_routes' => $subRoutes,
+                'extra'      => $extraData,
+            ],
+        ];
     }
 
 
@@ -308,7 +385,7 @@ class Router
                             $routeConfiguration['parameters'],
                             $routeConfiguration['sub_routes'],
                             $routeConfiguration['extra'],
-                            $routeConfiguration['callback']
+                            $routeConfiguration['options']['callback']
                         );
                     } catch (\Exception $exception) {
                         throw new RouteNotCreatedException($exception);
