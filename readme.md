@@ -5,6 +5,10 @@ dedicated controller to transmit route parameters.
 
 ## Change log
 
+1.1.2   
+        + fixed generated sub route handling
+        + created route add function
+
 1.1.1   
         + readme updated
         + added description to package
@@ -19,6 +23,8 @@ dedicated controller to transmit route parameters.
         + 1st release
 
 ## Code Sample
+
+### Array routes
 ```
 <?php
 use Widi\Components\Router\Route\Route;
@@ -166,6 +172,47 @@ if ($router->isRouteNotFound()) {
 ?>
 </body>
 </html>
+```
+
+### Generated routes
+```
+<?php
+
+$routerFactory = new \Widi\Components\Router\RouterFactory();
+$router        = $routerFactory->__invoke();
+
+//$router->setCaseSensitive(true);
+$router->setEnableRouteCallbacks(true);
+
+$router->addRoutes(
+    $router->buildRouteArray(
+        'my_route',
+        '/myRoute',
+        function (Route $route) {
+
+            echo $route->getRouteKey();
+        },
+        null,
+        null,
+        [],
+        [
+            $router->buildRouteArray(
+                'my_sub_route',
+                '/mySubRoute',
+                function (Route $route) {
+
+                    echo $route->getRouteKey();
+                }
+            ),
+        ]
+    )
+);
+
+$route = $router->route();
+
+if ($router->isRouteNotFound()) {
+    echo '404';
+}
 ```
 
 ## Files

@@ -4,7 +4,6 @@ namespace Widi\Components\Router;
 
 use Widi\Components\Router\Exception\RequestMethodNotCreatedException;
 use Widi\Components\Router\Exception\RouteComparatorNotCreatedException;
-use Widi\Components\Router\Exception\RouteKeyAlreadyExistsException;
 use Widi\Components\Router\Exception\RouteNotCreatedException;
 use Widi\Components\Router\Exception\ValidatorNotCreatedException;
 use Widi\Components\Router\Route\Comparator\ComparatorInterface;
@@ -99,7 +98,6 @@ class Router
      * @param array         $extraData
      *
      * @return array
-     * @throws RouteKeyAlreadyExistsException
      */
     public function buildRouteArray(
         $routeKey,
@@ -113,9 +111,12 @@ class Router
         $comparatorString = Equal::class,
         array $extraData = []
     ) {
+        $createdSubRoutes = [];
 
-        if (isset($this->routes[$routeKey])) {
-            throw new RouteKeyAlreadyExistsException($routeKey);
+        foreach ($subRoutes as $subRouteData) {
+            foreach ($subRouteData as $subRouteDataKey => $subRouteDataValue) {
+                $createdSubRoutes[$subRouteDataKey] = $subRouteDataValue;
+            }
         }
 
         return [
@@ -129,7 +130,7 @@ class Router
                     'callback'   => $callBack,
                 ],
                 'parameters' => $parameters,
-                'sub_routes' => $subRoutes,
+                'sub_routes' => $createdSubRoutes,
                 'extra'      => $extraData,
             ],
         ];
