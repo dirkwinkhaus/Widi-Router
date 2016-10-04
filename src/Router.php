@@ -111,6 +111,7 @@ class Router
         $comparatorString = Equal::class,
         array $extraData = []
     ) {
+
         $createdSubRoutes = [];
 
         foreach ($subRoutes as $subRouteData) {
@@ -242,6 +243,16 @@ class Router
     {
 
         return $this->enableRouteCallbacks;
+    }
+
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+
+        return $this->request;
     }
 
 
@@ -441,20 +452,24 @@ class Router
     protected function prepareDefaultArray(array $routeConfiguration)
     {
 
-        return $routeConfiguration +
-        [
-            'parameters' => [
-            ],
-            'options'    => [
-                'controller' => '',
-                'action'     => '',
-            ],
-            'sub_routes' => [
-            ],
-            'extra'      => [
-            ],
-            'callback'   => null,
-        ];
+        $routeConfiguration = $routeConfiguration +
+            [
+                'parameters' => [
+                ],
+                'sub_routes' => [
+                ],
+                'extra'      => [
+                ],
+            ];
+
+        $routeConfiguration['options'] = $routeConfiguration['options'] +
+            [
+                'controller' => null,
+                'action'     => null,
+                'callback'   => null,
+            ];
+
+        return $routeConfiguration;
     }
 
 

@@ -5,6 +5,10 @@ dedicated controller to transmit route parameters.
 
 ## Change log
 
+1.2.0   
+        + fix default routing array
+        + added get request feature
+
 1.1.2   
         + fixed generated sub route handling
         + created route add function
