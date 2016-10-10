@@ -5,6 +5,10 @@ dedicated controller to transmit route parameters.
 
 ## Change log
 
+1.4.0   
+        + added feature get route key path for accessmanagement
+        + remove build route array
+
 1.3.1   
         + added php version to composer
 
@@ -195,58 +199,18 @@ if ($router->isRouteNotFound()) {
 <h1>Router Demo</h1>
 <h2>route key: "<?php echo $route->getRouteKey(); ?>"</h2>
 <h3>controller: "<?php echo $route->getController(); ?>"</h3>
-<h4>action: "<?php echo $route->getAction(); ?>"</h4>
-<h5>route parameter</h5>
+<h3>action: "<?php echo $route->getAction(); ?>"</h3>
+<h3>route key path: "<?php echo $route->getRouteKeyPath(); ?>"</h3>
+<h3>route parameter</h3>
 <textarea style="width:100%; min-height:200px;"><?php print_r(
         $route->getParameter()
     ); ?></textarea>
-<h5>route extra data</h5>
+<h3>route extra data</h3>
 <textarea style="width:100%; min-height:200px;"><?php print_r(
         $route->getExtraData()
     ); ?></textarea>
 </body>
 </html>
-```
-
-### Generated routes
-```
-<?php
-
-$routerFactory = new \Widi\Components\Router\RouterFactory();
-$router        = $routerFactory->__invoke();
-
-//$router->setCaseSensitive(true);
-$router->setEnableRouteCallbacks(true);
-
-$router->addRoutes(
-    $router->buildRouteArray(
-        'my_route',
-        '/myRoute',
-        function (Route $route) {
-
-            echo $route->getRouteKey();
-        },
-        null,
-        null,
-        [],
-        [
-            $router->buildRouteArray(
-                'my_sub_route',
-                '/mySubRoute',
-                function (Route $route) {
-
-                    echo $route->getRouteKey();
-                }
-            ),
-        ]
-    )
-);
-
-$route = $router->route();
-
-if ($router->isRouteNotFound()) {
-    echo '404';
-}
 ```
 
 ## Files

@@ -14,6 +14,11 @@ class Route
 {
 
     /**
+     * @var string
+     */
+    const ROUTE_KEY_PATH_SEPARATOR = '//';
+
+    /**
      * @var array
      */
     protected $subRoutes;
@@ -68,6 +73,11 @@ class Route
      */
     protected $callBack;
 
+    /**
+     * @var string
+     */
+    protected $routeKeyPath;
+
 
     /**
      * Route constructor.
@@ -83,6 +93,7 @@ class Route
      * @param array               $subRoutes
      * @param array               $extraData
      * @param callable            $callback
+     * @param string              $routeKeyPath
      */
     public function __construct(
         MethodInterface $method,
@@ -95,7 +106,8 @@ class Route
         array $parameter = [],
         array $subRoutes = [],
         array $extraData = [],
-        callable $callback = null
+        callable $callback = null,
+        $routeKeyPath = ''
     ) {
 
         $this->subRoutes        = $subRoutes;
@@ -109,6 +121,10 @@ class Route
         $this->extraData        = $extraData;
         $this->parameter        = $parameter;
         $this->callBack         = $callback;
+        $this->routeKeyPath     =
+            $routeKeyPath .
+            self::ROUTE_KEY_PATH_SEPARATOR .
+            $routeKey;
     }
 
 
@@ -145,8 +161,7 @@ class Route
     /**
      * @return string
      */
-    public
-    function getController()
+    public function getController()
     {
 
         return $this->controller;
@@ -156,8 +171,7 @@ class Route
     /**
      * @return array
      */
-    public
-    function getSubRoutes()
+    public function getSubRoutes()
     {
 
         return $this->subRoutes;
@@ -167,8 +181,7 @@ class Route
     /**
      * @return bool
      */
-    public
-    function hasSubRoutes()
+    public function hasSubRoutes()
     {
 
         return (count($this->subRoutes) > 0);
@@ -178,8 +191,7 @@ class Route
     /**
      * @return string
      */
-    public
-    function getRoute()
+    public function getRoute()
     {
 
         return $this->route;
@@ -189,8 +201,7 @@ class Route
     /**
      * @return string
      */
-    public
-    function getRouteKey()
+    public function getRouteKey()
     {
 
         return $this->routeKey;
@@ -200,8 +211,7 @@ class Route
     /**
      * @return string
      */
-    public
-    function getRouteStringMatch()
+    public function getRouteStringMatch()
     {
 
         return $this->routeStringMatch;
@@ -253,8 +263,7 @@ class Route
     /**
      * @return bool
      */
-    public
-    function hasParameter()
+    public function hasParameter()
     {
 
         return count($this->parameter) > 0;
@@ -267,8 +276,7 @@ class Route
      *
      * @return $this
      */
-    public
-    function setParameterValue($key, $value
+    public function setParameterValue($key, $value
     ) {
 
         $this->parameter[$key]['value'] = $value;
@@ -284,5 +292,15 @@ class Route
     {
 
         return $this->callBack;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getRouteKeyPath()
+    {
+
+        return $this->routeKeyPath;
     }
 }

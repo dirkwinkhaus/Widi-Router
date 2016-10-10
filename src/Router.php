@@ -7,8 +7,6 @@ use Widi\Components\Router\Exception\RouteComparatorNotCreatedException;
 use Widi\Components\Router\Exception\RouteNotCreatedException;
 use Widi\Components\Router\Exception\ValidatorNotCreatedException;
 use Widi\Components\Router\Route\Comparator\ComparatorInterface;
-use Widi\Components\Router\Route\Comparator\Equal;
-use Widi\Components\Router\Route\Method\Get;
 use Widi\Components\Router\Route\Method\MethodInterface;
 use Widi\Components\Router\Route\Route;
 use Widi\Components\Router\Route\Validator\ValidatorInterface;
@@ -45,6 +43,11 @@ class Router
      * @var bool
      */
     protected $enableRouteCallbacks = false;
+
+    /**
+     * @var string
+     */
+    protected $routeKeyPath = '';
 
 
     /**
@@ -86,59 +89,6 @@ class Router
 
 
     /**
-     * @param string        $routeKey
-     * @param string        $route
-     * @param callable|null $callBack
-     * @param null          $controllerString
-     * @param null          $actionString
-     * @param array         $parameters
-     * @param array         $subRoutes
-     * @param string        $methodString
-     * @param string        $comparatorString
-     * @param array         $extraData
-     *
-     * @return array
-     */
-    public function buildRouteArray(
-        $routeKey,
-        $route,
-        callable $callBack = null,
-        $controllerString = null,
-        $actionString = null,
-        array $parameters = [],
-        array $subRoutes = [],
-        $methodString = Get::class,
-        $comparatorString = Equal::class,
-        array $extraData = []
-    ) {
-
-        $createdSubRoutes = [];
-
-        foreach ($subRoutes as $subRouteData) {
-            foreach ($subRouteData as $subRouteDataKey => $subRouteDataValue) {
-                $createdSubRoutes[$subRouteDataKey] = $subRouteDataValue;
-            }
-        }
-
-        return [
-            $routeKey => [
-                'route'      => $route,
-                'options'    => [
-                    'method'     => $methodString,
-                    'comparator' => $comparatorString,
-                    'controller' => $controllerString,
-                    'action'     => $actionString,
-                    'callback'   => $callBack,
-                ],
-                'parameters' => $parameters,
-                'sub_routes' => $createdSubRoutes,
-                'extra'      => $extraData,
-            ],
-        ];
-    }
-
-
-    /**
      * @param string $serverUri
      * @param string $serverMethod
      *
@@ -168,8 +118,9 @@ class Router
                 break;
             }
 
-            $routes    = $matchingRoute->getSubRoutes();
-            $serverUri = (string)substr(
+            $this->routeKeyPath = $matchingRoute->getRouteKeyPath();
+            $routes             = $matchingRoute->getSubRoutes();
+            $serverUri          = (string)substr(
                 $serverUri,
                 strlen($matchingRoute->getRouteStringMatch())
             );
@@ -406,7 +357,8 @@ class Router
                             $routeConfiguration['parameters'],
                             $routeConfiguration['sub_routes'],
                             $routeConfiguration['extra'],
-                            $routeConfiguration['options']['callback']
+                            $routeConfiguration['options']['callback'],
+                            $this->routeKeyPath
                         );
                     } catch (\Exception $exception) {
                         throw new RouteNotCreatedException($exception);
