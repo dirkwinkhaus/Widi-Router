@@ -1,9 +1,37 @@
 <?php
+use Widi\Components\Router\Route\Method\Get;
 use Widi\Components\Router\Route\Route;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 
 $routes = [
+    '404'           => [
+        'route'   => '/404',
+        'options' => [
+            'method'     => \Widi\Components\Router\Route\Method\Get::class,
+            'comparator' => \Widi\Components\Router\Route\Comparator\Equal::class,
+            'controller' => 'ErrorController404',
+            'action'     => 'indexAction',
+        ],
+    ],
+    '403'           => [
+        'route'   => '/403',
+        'options' => [
+            'method'     => \Widi\Components\Router\Route\Method\Get::class,
+            'comparator' => \Widi\Components\Router\Route\Comparator\Equal::class,
+            'controller' => 'ErrorController403',
+            'action'     => 'indexAction',
+        ],
+    ],
+    '500'           => [
+        'route'   => '/500',
+        'options' => [
+            'method'     => \Widi\Components\Router\Route\Method\Get::class,
+            'comparator' => \Widi\Components\Router\Route\Comparator\Equal::class,
+            'controller' => 'ErrorController500',
+            'action'     => 'indexAction',
+        ],
+    ],
     'root_route'    => [
         'route'   => '/',
         'options' => [
@@ -117,32 +145,25 @@ $router        = $routerFactory->__invoke($routes);
 $router->setEnableRouteCallbacks(true);
 
 $route = $router->route();
+if ($router->isRouteNotFound()) {
+    $route = $router->route('/404', Get::METHOD_STRING);
+}
 
 ?>
-    <!doctype html>
-    <html>
-    <body>
-    <h1>Router Demo</h1>
-    <?php
-    if ($router->isRouteNotFound()) {
-        ?>
-        <h2>404 Page not found!</h2>
-        <?php
-    } else {
-        ?>
-        <h2>route key: "<?php echo $route->getRouteKey(); ?>"</h2>
-        <h3>controller: "<?php echo $route->getController(); ?>"</h3>
-        <h4>action: "<?php echo $route->getAction(); ?>"</h4>
-        <h5>route parameter</h5>
-        <textarea style="width:100%; min-height:200px;"><?php print_r(
-                $route->getParameter()
-            ); ?></textarea>
-        <h5>route extra data</h5>
-        <textarea style="width:100%; min-height:200px;"><?php print_r(
-                $route->getExtraData()
-            ); ?></textarea>
-        <?php
-    }
-    ?>
-    </body>
-    </html>
+<!doctype html>
+<html>
+<body>
+<h1>Router Demo</h1>
+<h2>route key: "<?php echo $route->getRouteKey(); ?>"</h2>
+<h3>controller: "<?php echo $route->getController(); ?>"</h3>
+<h4>action: "<?php echo $route->getAction(); ?>"</h4>
+<h5>route parameter</h5>
+<textarea style="width:100%; min-height:200px;"><?php print_r(
+        $route->getParameter()
+    ); ?></textarea>
+<h5>route extra data</h5>
+<textarea style="width:100%; min-height:200px;"><?php print_r(
+        $route->getExtraData()
+    ); ?></textarea>
+</body>
+</html>

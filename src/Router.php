@@ -139,14 +139,23 @@ class Router
 
 
     /**
-     * @return Route
+     * @param string $serverUri
+     * @param string $serverMethod
+     *
+     * @return null|Route
      */
-    public function route()
+    public function route($serverUri = null, $serverMethod = null)
     {
 
-        $serverUri    = $this->getServerUri($this->request);
-        $serverMethod = $this->request->getRequestMethod();
-        $routes       = $this->routes;
+        if ($serverUri === null) {
+            $serverUri = $this->getServerUri($this->request);
+        }
+
+        if ($serverMethod === null) {
+            $serverMethod = $this->request->getRequestMethod();
+        }
+
+        $routes = $this->routes;
 
         do {
             $matchingRoute = $this->hitRoute(
