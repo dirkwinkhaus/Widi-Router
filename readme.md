@@ -5,6 +5,9 @@ dedicated controller to transmit route parameters.
 
 ## Change log
 
+1.3.1   
+        + added php version to composer
+
 1.3.0   
         + added feature to route manually and override 
           uri and method
