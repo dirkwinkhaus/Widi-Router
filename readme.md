@@ -1,9 +1,12 @@
-# Widi\Components\ServiceLocator
-Create a new router before you decide which controller to load. Use a 
-service locator to place the route within and/or give the route to the 
-dedicated controller to transmit route parameters.
+# Widi\Components\Router
 
 ## Change log
+
+2.0.1   
+        + updated readme and test path
+
+2.0.0  
+        + refactored to use psr7 request interface
 
 1.4.1   
         + fix readme file list
