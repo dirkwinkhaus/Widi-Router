@@ -2,6 +2,7 @@
 
 namespace Widi\Components\Router;
 
+use Psr\Http\Message\RequestInterface;
 use Widi\Components\Router\Exception\RequestMethodNotCreatedException;
 use Widi\Components\Router\Exception\RouteComparatorNotCreatedException;
 use Widi\Components\Router\Exception\RouteNotCreatedException;
@@ -25,7 +26,7 @@ class Router
     protected $routes;
 
     /**
-     * @var Request
+     * @var RequestInterface
      */
     protected $request;
 
@@ -49,20 +50,20 @@ class Router
      */
     protected $routeKeyPath = '';
 
-
     /**
      * Router constructor.
      *
-     * @param array   $routes
-     * @param Request $request
+     * @param RequestInterface $request
+     * @param array            $routes
      */
-    public function __construct(Request $request, array $routes = [])
-    {
+    public function __construct(
+        RequestInterface $request,
+        array $routes = []
+    ) {
 
         $this->routes  = $routes;
         $this->request = $request;
     }
-
 
     /**
      * @param array $routes
@@ -77,7 +78,6 @@ class Router
         return $this;
     }
 
-
     /**
      * @param array $routes
      */
@@ -87,22 +87,23 @@ class Router
         $this->routes = $this->routes + $routes;
     }
 
-
     /**
      * @param string $serverUri
      * @param string $serverMethod
      *
      * @return null|Route
      */
-    public function route($serverUri = null, $serverMethod = null)
-    {
+    public function route(
+        $serverUri = null,
+        $serverMethod = null
+    ) {
 
         if ($serverUri === null) {
             $serverUri = $this->getServerUri($this->request);
         }
 
         if ($serverMethod === null) {
-            $serverMethod = $this->request->getRequestMethod();
+            $serverMethod = strtolower($this->request->getMethod());
         }
 
         $routes = $this->routes;
@@ -124,7 +125,6 @@ class Router
                 $serverUri,
                 strlen($matchingRoute->getRouteStringMatch())
             );
-
         } while (
             $matchingRoute->hasSubRoutes()
             && !$this->validateLeftUri($matchingRoute, $serverUri)
@@ -151,7 +151,6 @@ class Router
         return $matchingRoute;
     }
 
-
     /**
      * @return boolean
      */
@@ -160,7 +159,6 @@ class Router
 
         return $this->routeNotFound;
     }
-
 
     /**
      * @return boolean
@@ -171,7 +169,6 @@ class Router
         return $this->caseSensitive;
     }
 
-
     /**
      * @param boolean $caseSensitive
      */
@@ -180,7 +177,6 @@ class Router
 
         $this->caseSensitive = $caseSensitive;
     }
-
 
     /**
      * @param boolean $enableRouteCallbacks
@@ -195,7 +191,6 @@ class Router
         return $this;
     }
 
-
     /**
      * @return boolean
      */
@@ -205,9 +200,8 @@ class Router
         return $this->enableRouteCallbacks;
     }
 
-
     /**
-     * @return Request
+     * @return RequestInterface
      */
     public function getRequest()
     {
@@ -215,15 +209,16 @@ class Router
         return $this->request;
     }
 
-
     /**
      * @param Route  $matchingRoute
      * @param string $leftUri
      *
      * @return bool
      */
-    protected function validateLeftUri(Route $matchingRoute, $leftUri)
-    {
+    protected function validateLeftUri(
+        Route $matchingRoute,
+        $leftUri
+    ) {
 
         if ($matchingRoute->hasParameter()) {
             $parametersFoundInUri = $this->getParametersFromLeftUri(
@@ -243,7 +238,7 @@ class Router
 
                 $parameterIsMandatoryButMissing
                     = (($routeParameter['mandatory'] === true)
-                    && (!isset($parametersFoundInUri[$parameterIndex])));
+                       && (!isset($parametersFoundInUri[$parameterIndex])));
 
                 if ($parameterIsMandatoryButMissing) {
                     return false;
@@ -279,12 +274,10 @@ class Router
 
                 return true;
             }
-
         }
 
         return false;
     }
-
 
     /**
      * @param array  $routes
@@ -310,12 +303,8 @@ class Router
                 $routeConfiguration
             );
 
-            try {
-                /** @var MethodInterface $method */
-                $methodClassString = $routeConfiguration['options']['method'];
-            } catch (\Exception $exception) {
-                throw new RequestMethodNotCreatedException($exception);
-            }
+            /** @var MethodInterface $method */
+            $methodClassString = $routeConfiguration['options']['method'];
 
             if (!class_exists($methodClassString)) {
                 throw new RequestMethodNotCreatedException();
@@ -370,7 +359,6 @@ class Router
         return null;
     }
 
-
     /**
      * @param $comparatorField
      *
@@ -385,7 +373,6 @@ class Router
 
         return $comparatorField;
     }
-
 
     /**
      * @param array $routeParameter
@@ -404,7 +391,6 @@ class Router
         return $routeParameter;
     }
 
-
     /**
      * @param array $routeConfiguration
      *
@@ -414,25 +400,24 @@ class Router
     {
 
         $routeConfiguration = $routeConfiguration +
-            [
-                'parameters' => [
-                ],
-                'sub_routes' => [
-                ],
-                'extra'      => [
-                ],
-            ];
+                              [
+                                  'parameters' => [
+                                  ],
+                                  'sub_routes' => [
+                                  ],
+                                  'extra'      => [
+                                  ],
+                              ];
 
         $routeConfiguration['options'] = $routeConfiguration['options'] +
-            [
-                'controller' => null,
-                'action'     => null,
-                'callback'   => null,
-            ];
+                                         [
+                                             'controller' => null,
+                                             'action'     => null,
+                                             'callback'   => null,
+                                         ];
 
         return $routeConfiguration;
     }
-
 
     /**
      * @param $serverUri
@@ -448,7 +433,6 @@ class Router
         return $serverUri;
     }
 
-
     /**
      * @param $serverUri
      *
@@ -461,7 +445,6 @@ class Router
 
         return $serverUri;
     }
-
 
     /**
      * @param $serverUri
@@ -476,26 +459,18 @@ class Router
         return $serverUri;
     }
 
-
     /**
-     * @param Request $request
+     * @param RequestInterface $request
      *
      * @return string
      */
-    protected function getServerUri(Request $request)
+    protected function getServerUri(RequestInterface $request)
     {
 
-        if ($request->hasGetMethod('getPathInfo')) {
-            $serverUri = $request->getPathInfo();
-        } else {
-            $serverUri = '';
-        }
-
-        $serverUri = $this->removeTrailingSlashes($serverUri);
+        $serverUri = $this->removeTrailingSlashes($request->getUri());
 
         return $serverUri;
     }
-
 
     /**
      * @param string $leftUri
@@ -510,7 +485,6 @@ class Router
 
         return $parameters;
     }
-
 
     /**
      * @param string $parametersFoundInUri

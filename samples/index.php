@@ -1,6 +1,7 @@
 <?php
 use Widi\Components\Router\Route\Method\Get;
 use Widi\Components\Router\Route\Route;
+use Widi\Components\Router\Router;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 
@@ -53,17 +54,6 @@ $routes = [
     'my_parameters' => [
         'route'      => '/parameters',
         'parameters' => [
-            'key1' => [
-                'mandatory'  => true,
-                'validators' => [
-                    [
-                        'class' => \Widi\Components\Router\Route\Validator\NotEmpty::class,
-                    ],
-                    [
-                        'class' => \Widi\Components\Router\Route\Validator\IsString::class,
-                    ],
-                ],
-            ],
             'key2' => [
                 'validators' => [
                     [
@@ -71,6 +61,12 @@ $routes = [
                         'parameter' => '/^\d{1,3}$/',
                     ],
                 ],
+            ],
+            'options'    => [
+                'method'     => \Widi\Components\Router\Route\Method\Get::class,
+                'comparator' => \Widi\Components\Router\Route\Comparator\Equal::class,
+                'controller' => 'ParameterController',
+                'action'     => 'DetailAction',
             ],
         ],
         'options'    => [
@@ -89,7 +85,7 @@ $routes = [
             'action'     => 'topAction',
             'callback'   =>
                 function (Route $route) {
-
+                    $route->setParameterValue('myParameter', 'value');
                     echo 'callback of ' . $route->getRouteKey() . ' executed';
                 },
         ],
@@ -138,8 +134,16 @@ $routes = [
     ],
 ];
 
-$routerFactory = new \Widi\Components\Router\RouterFactory();
-$router        = $routerFactory->__invoke($routes);
+
+$request = new \GuzzleHttp\Psr7\Request(
+    $_SERVER['REQUEST_METHOD'],
+    $_SERVER['PATH_INFO']
+);
+
+$router = new Router(
+    $request,
+    $routes
+);
 
 //$router->setCaseSensitive(true);
 $router->setEnableRouteCallbacks(true);
