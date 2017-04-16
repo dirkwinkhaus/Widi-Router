@@ -467,7 +467,7 @@ class Router
     protected function getServerUri(RequestInterface $request)
     {
 
-        $serverUri = $this->removeTrailingSlashes($request->getUri());
+        $serverUri = $this->removeTrailingSlashes($request->getUri()->getPath());
 
         return $serverUri;
     }

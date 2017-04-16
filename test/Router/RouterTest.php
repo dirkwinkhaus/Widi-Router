@@ -10,8 +10,6 @@ use Widi\Components\Router\Exception\ValidatorNotCreatedException;
 use Widi\Components\Router\Route\Route;
 use Widi\Components\Router\Router;
 
-require_once(__DIR__ . '/../../vendor/autoload.php');
-
 /**
  * Class RouterTest
  *
@@ -19,10 +17,21 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
  */
 class RouterTest extends TestCase
 {
+    public function testRootWithFullUrl()
+    {
+        $router = new Router(
+            $this->getRequestForPath('http://localhost:8000/'),
+            $this->getDefaultRouteConfig()
+        );
+
+        $route = $router->route();
+
+        $this->assertFalse($router->isRouteNotFound());
+        $this->assertEquals($route->getRouteKey(), 'root_route');
+    }
 
     public function testRootEqualRouting()
     {
-
         $router = new Router(
             $this->getRequestForPath('/'),
             $this->getDefaultRouteConfig()
